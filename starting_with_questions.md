@@ -17,7 +17,13 @@ Answer:
 
 
 SQL Queries:
-
+SELECT
+ 	a.city,
+    a.country,
+    AVG(p."orderedQuantity") AS avg_ordered_quantity
+FROM alsessions AS a
+JOIN products AS p ON a.productsku = p."SKU"
+GROUP BY a.city, a.country;
 
 
 Answer:
