@@ -38,3 +38,15 @@ ALTER TABLE allsessions DROP COLUMN sessionqualitydim
 
 
 ALTER SESSIONQUALITYDIM
+
+
+
+
+Fixing "(not set)" in the city column. I cleaned it by identififying the countires and using a case statement to update the city based on the country
+
+UPDATE alsessions
+SET country = NULL
+WHERE country = '(not set)' or country = 'not available in demo dataset';
+
+DELETE FROM alsessions
+WHERE city IS NULL or country is NULL;
