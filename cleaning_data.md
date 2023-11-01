@@ -1,28 +1,43 @@
 What issues will you address by cleaning the data?
+1. Moving irrelevant data and inserting into appropriate table
+2. Deleting irrenlevant data and null values
+3. Altering the table and updating empty table values
+4. Data type validation
+5. Caste stetements to populate column based on criterion set
+   
 - Removing irrelveant data and empty Columns:
-ALLSESSIONS:
-    - Deleted Transactionid Column: After comparing the transactionID colunm I found only 6 columns without Null values it was therefore better to delete the entire column than rows with null values for transactionId
-    - Deleted totaltransactionrevenue: Had missing values for majority of the column
-    - Deleted transaction: Had missing values for majority of the column 
-    - Deleted ItemRevenue: ALL values were null and it had no significance to the table
-    - Deleted searchKeyword: ALL values in the column were null and it had no significance to the table
-    - Deleted productrevenue: Only had 4 values in the column
-    - SessionQualityDim: Had values for majority of the rows, so I deleted rows with no value in them
-    - Deleted itemquantity: ALL values were null and it had no significance to the table
-    - Deleted productrefundamount: ALL values were null and it had no significance to the table
-    - Deleted productquatity: Not enough data set
-    - Deleted transactionrevenue: Not enough data set
 
 
 
-CONVERTING TO THE APPROPRIATE DATA TYPES
+
+- CONVERTING TO THE APPROPRIATE DATA TYPES
+ALTER TABLE analytics
+ALTER COLUMN timeonsite TYPE interval USING timeonsite * interval '1 second';
+
+ALTER TABLE analytics
+ALTER COLUMN date TYPE DATE USING to_date("date"::text, 'YYYYMMDD');
+
+ALTER TABLE alsessions
+ALTER COLUMN "time" TYPE TIME USING (make_time("time" / 3600, ("time" % 3600) / 60, "time" % 60));
+
+
+- Data type validation
+UPDATE alsessions
+SET v2productcategory = NULL
+WHERE v2productcategory = '(not set)' or v2productcategory = 'not available in demo dataset';
+
+UPDATE alsessions AS a
+SET timeonsite = al.timeonsite
+FROM analytics AS al
+WHERE a.fullvisitorid = al."fullvisitorId";
+
 
 
 
 Queries:
 Below, provide the SQL queries you used to clean your data.
-ALTER TABLE all_sessions DROP COLUMN "transactionId"
 
+-Getting rid of irrelevant data and moving it to appropriate data table
 ALTER TABLE allsessions DROP COLUMN transactionid
 ALTER TABLE allsessions DROP COLUMN itemrevenue
 ALTER TABLE allsessions DROP COLUMN searchkeyword
@@ -36,13 +51,7 @@ ALTER TABLE allsessions DROP COLUMN transactionrevenue
 ALTER TABLE allsessions DROP COLUMN sessionqualitydim
 
 
-
-ALTER SESSIONQUALITYDIM
-
-
-
-
-Fixing "(not set)" in the city column. I cleaned it by identififying the countires and using a case statement to update the city based on the country
+- Fixing "(not set)" in the city column. I cleaned it by identififying the countires and using a case statement to update the city based on the country
 
 UPDATE alsessions
 SET country = NULL
